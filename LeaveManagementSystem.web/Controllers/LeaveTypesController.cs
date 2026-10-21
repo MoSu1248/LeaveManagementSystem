@@ -4,9 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using LeaveManagementSystem.web.Data;
 using LeaveManagementSystem.web.Models.LeaveTypes;
 using LeaveManagementSystem.web.Services;
+
+    [Authorize(Roles = Roles.Administrator)]
 public class LeaveTypesController(ILeaveTypesService leaveTypesService) : Controller
 {
-
     private string NameExistsValidationMessage = "this leave type with this name already exists.";
     private readonly ILeaveTypesService _leaveTypesService = leaveTypesService;
 
