@@ -3,9 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using LeaveManagementSystem.web.Data;
 using LeaveManagementSystem.web.Models.LeaveTypes;
-using LeaveManagementSystem.web.Services;
+using LeaveManagementSystem.web.Services.LeaveTypes;
 
-    [Authorize(Roles = Roles.Administrator)]
+[Authorize(Roles = Roles.Administrator)]
 public class LeaveTypesController(ILeaveTypesService leaveTypesService) : Controller
 {
     private string NameExistsValidationMessage = "this leave type with this name already exists.";
@@ -63,10 +63,6 @@ public class LeaveTypesController(ILeaveTypesService leaveTypesService) : Contro
         }
         return View(leaveTypeCreateVM);
     }
-
-
-
-
 
     // GET: LEAVETYPES/Edit/5
     public async Task<IActionResult> Edit(int? id)

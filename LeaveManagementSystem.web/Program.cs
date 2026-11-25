@@ -1,5 +1,11 @@
+using AutoMapper;
 using LeaveManagementSystem.web.Data;
-using LeaveManagementSystem.web.Services;
+using LeaveManagementSystem.web.Services.Email;
+using LeaveManagementSystem.web.Services.LeaveAllocations;
+using LeaveManagementSystem.web.Services.LeaveRequests;
+using LeaveManagementSystem.web.Services.LeaveTypes;
+using LeaveManagementSystem.web.Services.Periods;
+using LeaveManagementSystem.web.Services.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
@@ -16,10 +22,32 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.R
     .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
 builder.Services.AddScoped<ILeaveTypesService, LeaveTypesService>();
+builder.Services.AddScoped<ILeavesAllocationService, LeavesAllocationService>();
+builder.Services.AddScoped<ILeaveRequestsService, LeaveRequestsService>();
+builder.Services.AddScoped<IPeriodsService, PeriodsService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminSupervisorOnly", policy =>
+    policy.RequireRole(Roles.Administrator, Roles.Supervisor));
+});
+
+
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 
+
+
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var mapper = scope.ServiceProvider.GetRequiredService<IMapper>();
+    mapper.ConfigurationProvider.AssertConfigurationIsValid();
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -37,6 +65,8 @@ app.UseHttpsRedirection();
 app.UseRouting();
 
 app.UseAuthorization();
+
+
 
 app.MapStaticAssets();
 

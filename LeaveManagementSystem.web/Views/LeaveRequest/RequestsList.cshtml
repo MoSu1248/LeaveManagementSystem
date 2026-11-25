@@ -1,0 +1,94 @@
+﻿@using LeaveManagementSystem.web.Models.LeaveRequests
+@using LeaveManagementSystem.web.Data
+@model LeaveRequestReadOnlyVM
+
+@{
+    ViewData["Title"] = "View Leave Requests";
+}
+
+<h1>Admin Leave Requests View</h1>
+
+<div class="row">
+    <div class="col">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="card-title text-primary">@Model.TotalRequests</h1>
+                <h5 class="card-text">@Html.DisplayNameFor(model => model.TotalRequests)</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="card-title text-primary">@Model.ApprovedRequests</h1>
+                <h5 class="card-text">@Html.DisplayNameFor(model => model.ApprovedRequests)</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="card-title text-primary">@Model.PendingRequests</h1>
+                <h5 class="card-text">@Html.DisplayNameFor(model => model.PendingRequests)</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="card">
+            <div class="card-body text-center">
+                <h1 class="card-title text-primary">@Model.RejectedRequests</h1>
+                <h5 class="card-text">@Html.DisplayNameFor(model => model.RejectedRequests)</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Html.DisplayNameFor(m => m.LeaveRequests.First().LeaveType)</th>
+            <th>@Html.DisplayNameFor(m => m.LeaveRequests.First().StartDate)</th>
+            <th>@Html.DisplayNameFor(m => m.LeaveRequests.First().LeaveRequestStatus)</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.LeaveRequests)
+        {
+            var className = string.Empty;
+
+            if (item.LeaveRequestStatus == LeaveRequestStatusCode.Pending)
+            {
+                className = "warning";
+            }
+            else if (item.LeaveRequestStatus == LeaveRequestStatusCode.Approved)
+            {
+                className = "success";
+            }
+            else if (item.LeaveRequestStatus == LeaveRequestStatusCode.Rejected)
+            {
+                className = "danger";
+            }
+            else if (item.LeaveRequestStatus == LeaveRequestStatusCode.Cancelled)
+            {
+                className = "dark";
+            }
+
+            <tr>
+                <td>@Html.DisplayFor(m => item.LeaveType)</td>
+                <td>@Html.DisplayFor(m => item.StartDate)</td>
+                <td>
+                    <span class="badge rounded-pill text-bg-@className">
+                        @Html.DisplayFor(m => item.LeaveRequestStatus)
+                    </span>
+                </td>
+                <td>
+                    @if (item.LeaveRequestStatus == LeaveRequestStatusCode.Pending)
+                    {
+                        <a asp-action="Review" class="btn btn-primary btn-sm" asp-route-leaveRequestId="@item.Id">Review</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

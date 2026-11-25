@@ -89,5 +89,18 @@
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(function () {
+            $("#StartDate").datepicker({
+                dateFormat: "yy-mm-dd",
+changeMonth: true,
+      changeYear: true
+            });
+            $("#EndDate").datepicker({
+                dateFormat: "yy-mm-dd",changeMonth: true,
+      changeYear: true
+            });
+        });
+    </script>
 }

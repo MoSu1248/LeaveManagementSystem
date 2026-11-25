@@ -1,0 +1,87 @@
+﻿@model EmployeeAllocationVM
+
+@{
+    ViewData["Title"] = "View Allocations";
+    var isAdmin = User.IsInRole(Roles.Administrator);
+    string message = isAdmin ? "You have no allocations." : "You have no allocations. Please contact your manager.";
+}
+
+<h1>View Allocations for @Model.FirstName @Model.LastName</h1>
+
+@if (isAdmin)
+{
+    <a asp-action="Index" class="btn btn-primary mb-3">Back to List</a>
+}
+
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-2">@Html.DisplayNameFor(model => model.FirstName)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(model => model.FirstName)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(model => model.LastName)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(model => model.LastName)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(model => model.Email)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(model => model.Email)</dd>
+
+    <dt class="col-sm-2">@Html.DisplayNameFor(model => model.DateOfBirth)</dt>
+    <dd class="col-sm-10">@Html.DisplayFor(model => model.DateOfBirth)</dd>
+</dl>
+
+@if (isAdmin && !Model.IsCompletedAllocations)
+{
+    <div class="alert alert-warning d-flex justify-content-between align-items-center" role="alert">
+        <span>User is missing some leave allocations.</span>
+        <form asp-action="AllocateLeave" method="post" class="mb-0">
+            <input type="hidden" asp-for="userId" />
+            <button type="submit" class="btn btn-warning btn-sm">Allocate Leave</button>
+        </form>
+    </div>
+}
+
+@if (Model.LeaveAllocations.Any())
+{
+    <div class="card">
+        <div class="card-header">
+            <h4 class="mb-0">Leave Allocation for period @Model.LeaveAllocations[0].Period.Name</h4>
+        </div>
+        <table class="table mb-0">
+            <thead>
+                <tr>
+                    <th>Leave Name</th>
+                    <th>Days Left</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var allocation in Model.LeaveAllocations)
+                {
+                    <tr>
+                        <td>@allocation.LeaveType.Name</td>
+                        <td>
+                            <span class="badge rounded-pill text-bg-primary">@allocation.NumberOfDays</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                @if (isAdmin)
+                                {
+                                    <a asp-action="EditAllocation" asp-route-allocationId="@allocation.Id" class="btn btn-primary btn-sm">Edit</a>
+                                }
+                                        
+                                <a class="btn btn-success btn-sm" asp-area="Create" asp-controller="LeaveRequest" asp-action="Create" asp-route-leaveTypeId="@allocation.LeaveType.Id">Request Leave</a>
+                            
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        <p class="mb-0">@message</p>
+    </div>
+}

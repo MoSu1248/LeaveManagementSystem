@@ -1,6 +1,7 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using LeaveManagementSystem.web.Services.LeaveAllocations;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
@@ -10,6 +11,7 @@ namespace LeaveManagementSystem.web.Areas.Identity.Pages.Account;
 
 public class RegisterModel : PageModel
 {
+
     private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IUserStore<ApplicationUser> _userStore;
@@ -17,15 +19,19 @@ public class RegisterModel : PageModel
     private readonly ILogger<RegisterModel> _logger;
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly IEmailSender _emailSender;
+    private readonly ILeavesAllocationService _leavesAllocationService;
 
     public RegisterModel(
+        ILeavesAllocationService leavesAllocationService,
         UserManager<ApplicationUser> userManager,
         IUserStore<ApplicationUser> userStore,
         SignInManager<ApplicationUser> signInManager,
         ILogger<RegisterModel> logger,
         RoleManager<IdentityRole> roleManager,
         IEmailSender emailSender)
+
     {
+        _leavesAllocationService = leavesAllocationService;
         _userManager = userManager;
         _userStore = userStore;
         _emailStore = GetEmailStore();
@@ -164,6 +170,9 @@ public class RegisterModel : PageModel
                 }
 
                 var userId = await _userManager.GetUserIdAsync(user);
+
+                await _leavesAllocationService.AllocateLeave(userId);
+
                 var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                 code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
                 var callbackUrl = Url.Page(
@@ -184,6 +193,7 @@ public class RegisterModel : PageModel
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     return LocalRedirect(returnUrl);
                 }
+
             }
             foreach (var error in result.Errors)
             {
